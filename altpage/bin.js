@@ -8,28 +8,59 @@ function hook(str, args) {
         return true
     }
 
+    //check for a subreddit
+    if (str.slice(0,3) === "/r/" || str.slice(0,3) === "/u/") {
+        loadURL("https://www.reddit.com" + str)
+        return true
+    }
+
+    //check for a 4chan board
+    if(str[0] === "/" && (
+        str[str.length-1] === "/" || str.length < 5)) {
+        //then it's not guaranteed to be a 4chan board, but let's try it anyway
+        //everything but the slash at the beginning
+        loadURL("https://boards.4chan.org/" + str.substr(1))
+        return true
+    }
+
     if (hookCommands.indexOf(str) > -1) {
         //call it as a function
         //args are an array
         window[str](args.join(" "));
-        return true;
+        return true
+    }
+
+    //and now check for bookmarks
+    if (typeof bookmarks != "undefined" && bookmarks.length > 0) {
+        for (var i=0; i<bookmarks.length; i++) {
+            if(bookmarks[i][0] === str) {
+                loadURL(bookmarks[i][1])
+                return true;
+            }
+        }
+
     }
 
 }
 
 //==================== CHALLENGE COMMANDS ==========================
-var hookCommands = ['cstheory',
+var hookCommands = [
+    'chan',
     'date',
-    'listentothis',
-    'play',
-    'pawprint',
-    'school',
-    'spotify',
+    'reddit',
     'time',
     'weather',
-    'wiki',
-    'wolfram',
-    'write'];
+];
+
+var bookmarks = [
+    ['cstheory', 'http://www.cs.columbia.edu/~aho/cs3261/'],
+    ['listentothis', "https://www.reddit.com/r/listentothis/"],
+    ['pawprint', 'https://pawprtprodmprt1.cuit.columbia.edu/myprintcenter/'],
+    ['play', 'https://play.google.com/music/listen?hl=en&u=0#/wmp'],
+    ['school', 'https://drive.google.com/drive/u/0/folders/0B57efURGOOGiVzFMWnl1QktUd2s'],
+    ['spotify', 'https://play.spotify.com/collection/songs'],
+    ['write', 'https://drive.google.com/drive/u/0/folders/0B57efURGOOGid2tDS1cyVE1zWk0'],
+]
 
 function name(str) {
     setName(str)
@@ -56,7 +87,6 @@ function weather() {
     $.when(
         $.getJSON(json_url)
     ).done(function(json_obj) {
-        console.log(json_obj)
 		city = json_obj["name"];
 		temp_curr = k_to_f(json_obj["main"]["temp"]);
 		temp_low = k_to_f(json_obj["main"]["temp_min"]);
@@ -76,67 +106,9 @@ function weather() {
 	})
 }
 
-function listentothis(str) {
-    print("Loading /r/listentothis...")
-    if (str != "top") window.location = "https://www.reddit.com/r/listentothis/"
-    else window.location = "https://www.reddit.com/r/listentothis/top"
-}
-
-function wolfram(str) {
-    if (str === "") {
-        print("Usage: wolfram [query]");
-        return
-    } else {
-        print("Loading " + "http://www.wolframalpha.com/input/?i=" +
-        str.replace("+", "%2B"))
-        console.log(str)
-        window.location =
-        "http://www.wolframalpha.com/input/?i=" +
-        str.replace("+", "%2B");
-    }
-}
-
-function wiki(str) {
-    if (str === "") {
-        print("Usage: wiki [query]");
-        return
-    } else {
-        print("Loading " + "https://en.wikipedia.org/w/index.php?search=" +
-        str.replace(" ", "%20"));
-        window.location =
-        "https://en.wikipedia.org/w/index.php?search=" +
-        str.replace(" ", "%20");
-    }
-}
-
 function loadURL(url) {
     print("Loading " + url + "...")
     window.location = url
-}
-
-function spotify(str) {
-    print("Loading https://play.spotify.com/collection/songs...")
-    window.location = "https://play.spotify.com/collection/songs"
-}
-
-function play(str) {
-    loadURL("https://play.google.com/music/listen?hl=en&u=0#/wmp")
-}
-
-function cstheory(str) {
-    loadURL("http://www.cs.columbia.edu/~aho/cs3261/")
-}
-
-function pawprint(str) {
-    loadURL("https://pawprtprodmprt1.cuit.columbia.edu/myprintcenter/")
-}
-
-function school(str) {
-    loadURL("https://drive.google.com/drive/u/0/folders/0B57efURGOOGiVzFMWnl1QktUd2s")
-}
-
-function write(str) {
-    loadURL("https://drive.google.com/drive/u/0/folders/0B57efURGOOGid2tDS1cyVE1zWk0")
 }
 
 function time(str) {
@@ -176,4 +148,12 @@ function date(s) {
     var year = date.getFullYear();
 
     print(days[weekday] + ", " + monthNames[monthIndex] + " " + day)
+}
+
+function reddit(s) {
+    print("Usage: /r/[subreddit] or /u/[user]")
+}
+
+function chan(s) {
+    print("Usage: /[board] or /[board]/")
 }

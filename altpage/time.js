@@ -35,7 +35,7 @@ function startDate() {
     var monthIndex = date.getMonth();
     var year = date.getFullYear();
 
-    document.getElementById("date").innerHTML = days[weekday] + ", " + monthNames[monthIndex] + " " + day;
+    //document.getElementById("date").innerHTML = days[weekday] + ", " + monthNames[monthIndex] + " " + day;
 }
 
 startTime()

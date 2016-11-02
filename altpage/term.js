@@ -39,7 +39,7 @@ function getMachine() {
 }
 
 function setMachine(str) {
-    if(machine == "") {
+    if(str == "") {
         print("usage: machine [newname]")
         return;
     }
@@ -87,6 +87,12 @@ function handle(text) {
     if (input.match(/^d+[0-9]+$/)) {
         rollDie(input);
         return;
+    }
+
+    //intercepting the function here to search
+    if (searchString(input)) {
+        print("Searching for " + input.slice(0, input.length-3) + "...")
+        return
     }
 
     var firstWord = input;
@@ -140,7 +146,7 @@ function fancyRender(text, color, size) {
 }
 
 //====================  TERMINAL FUNCTIONS  ========================
-var terminalFunctions = ["about", "clear", "echo", "help", "history", "ls", "name", "machine", "render"];
+var terminalFunctions = ["about", "clear", "echo", "help", "history", "ls", "name", "machine", "re", "render", 'search'];
 
 function clear(input) {
     var data = '<p id="prompt" class="prompt">' + getName() + '@' + getMachine() + ':$&nbsp;</p><pre id="input" contenteditable="true" autofocus="true" spellcheck="false"></pre>'
@@ -162,18 +168,44 @@ function history(input) {
 
 function help(input) {
     //add some kind of help for various functions (like rendering)
+    fancyRender("general", "lightgray")
     for (var i=0; i<terminalFunctions.length; i++) {
         print(terminalFunctions[i]);
     }
-    print("---")
+    fancyRender("functions", "lightgray")
     if (typeof hookCommands != "undefined" && hookCommands.length > 0) {
         for (var i=0; i<hookCommands.length; i++) {
             print(hookCommands[i]);
         }
     }
+    fancyRender("bookmarks", "lightgray")
+    if (typeof bookmarks != "undefined" && bookmarks.length > 0) {
+        for (var i=0; i<bookmarks.length; i++) {
+            print(bookmarks[i][0]);
+        }
+    }
 }
 
 function ls(input) {
+    //horrible. converts input to a string by adding an empty string.
+    if(input.slice(input.length - 2, input.length) + "" === "-b") {
+        fancyRender("bookmarks", "lightgray")
+        if (typeof bookmarks != "undefined" && bookmarks.length > 0) {
+            for (var i=0; i<bookmarks.length; i++) {
+                print(bookmarks[i][0]);
+            }
+        }
+        return;
+    }
+    if(input.slice(input.length - 2, input.length) + "" === "-f") {
+        fancyRender("functions", "lightgray")
+        if (typeof hookCommands != "undefined" && hookCommands.length > 0) {
+            for (var i=0; i<hookCommands.length; i++) {
+                print(hookCommands[i]);
+            }
+        }
+        return;
+    }
     help(input)
 }
 
@@ -193,6 +225,10 @@ function echo(args) {
     print(args.join(" "));
 }
 
+function re(s) {
+    location.reload();
+}
+
 function render(args) {
     var usage = "usage: render [text]; [color] [size]"
     if (args.length === 0) {
@@ -209,6 +245,16 @@ function render(args) {
         return
     }
     fancyRender(args[0], cssVars[0], cssVars[1]);
+}
+
+function search(s) {
+    print("Usage: [query] -x")
+    print("x is a switch for: ")
+    print("a:   amazon")
+    print("m:   wolfram alpha")
+    print("v:   vimeo")
+    print("w:   wikipedia")
+    print("y:   youtube")
 }
 
 //====================  HISTORY  ===================================
@@ -243,4 +289,48 @@ function autocomplete(string) {
             }
         }
     }
+    if (typeof bookmarks != "undefined" && bookmarks.length > 0) {
+        for (var i=0; i<bookmarks.length; i++) {
+            console.log(bookmarks[i])
+            if(bookmarks[i][0].indexOf(string) === 0) {
+                document.getElementById("input").innerHTML = bookmarks[i][0];
+                return;
+            }
+        }
+
+    }
+}
+
+//====================  SEARCHING ==================================
+function searchString(query) {
+    var original = query;
+    var modifier = query.substr(query.length-2);
+    query = query.slice(0, query.length-3); //remove " -x"
+    switch (modifier) {
+        case "-a":
+            window.location = "http://www.smile.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords=" +
+            query.replace(" ", "+");
+            return true;
+        case "-y":
+            window.location =
+                "https://www.youtube.com/results?search_query=" +
+                query.replace(" ", "+");
+            return true;
+        case "-w":
+            window.location =
+                "https://en.wikipedia.org/w/index.php?search=" +
+                query.replace(" ", "%20");
+            return true;
+    	case "-m":
+    	    window.location =
+    		"http://www.wolframalpha.com/input/?i=" +
+    		query.replace("+", "%2B");
+            return true;
+        case "-v":
+            window.location =
+            "https://vimeo.com/search?q=" +
+            query.replace(" ", "+");
+            return true;
+    }
+    return false;
 }

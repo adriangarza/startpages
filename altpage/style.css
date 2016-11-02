@@ -77,15 +77,15 @@ pre {
 }
 
 #terminal-container {
-	padding: 2vh;
+	padding: 12pt;
 	width: 80%;
 	margin-left: auto;
 	margin-right: auto;
 	height: 80%;
 	max-height: 80%;
 	background-color: #151515;
-	opacity: .9 !important;
-	border-radius: 2px;
+	opacity: .9 ;
+	border-radius: 1px;
 	/*center it vertically*/
 	position: relative;
 	top: 50%;
@@ -97,4 +97,8 @@ pre {
 	font-family: monospace;
 	color: gray;
 	margin-left: 1em;
+}
+
+#input>span {
+	max-width: 100%;
 }
