@@ -259,7 +259,7 @@ function search(s) {
 
 //====================  HISTORY  ===================================
 //keep duplicates from being added, change "" to &nbsp;
-var lastInputs = []
+var lastInputs = [""]
 var inputIndex = 0;
 
 //adds to the beginning of the array
