@@ -2,6 +2,13 @@ var editBlob = '<div id="editWrapper"><textarea id="editArea" rows="40" cols="80
 var editing = false;
 var currentFileName = ""
 var files = {}
+var fileFunctions = [
+    'edit',
+    'close',
+    'save',
+    'rm',
+    'cat',
+]
 
 //files are stored as an object with keys (filenames) and values (innerHTML)
 
@@ -11,9 +18,19 @@ if (localStorage.getItem("textFiles")) {
     files = JSON.parse(localStorage.getItem("textFiles"))
 }
 
+//add an escape listener to get back to the input line
+$(document).keyup(function(e) {
+     if (e.keyCode == 27 && editing) { // escape
+        document.getElementById("input").focus();
+    }
+});
+
 function edit(fileName) {
     //make sure there's no window open already
-    if (editing) return;
+    if (editing){
+        print("Can't open two files at once, friend.")
+        return
+    }
     //make sure there's a filename
     if (fileName === "") {
         print("Usage: edit [filename]")
@@ -29,7 +46,8 @@ function edit(fileName) {
     }
     document.getElementById("editArea").focus();
     editing = true;
-    save()
+    files[currentFileName] = editArea.value;
+    localStorage.setItem("textFiles", JSON.stringify(files))
 }
 
 function save() {
@@ -65,9 +83,30 @@ function rm(fileName) {
     if (files.hasOwnProperty(fileName)) {
         delete files[fileName]
         print(fileName + " deleted.")
-        close()
+        if (editing) {
+            $("#editWrapper").remove()
+            editing = false;
+        }
     } else {
         print(fileName + " doesn't exist.")
     }
     localStorage.setItem("textFiles", JSON.stringify(files))
+}
+
+function cat(fileName) {
+    if (fileName === "") {
+        print("Usage: cat [filename]")
+        return
+    }
+
+    if (files.hasOwnProperty(fileName)) {
+        print(files[fileName])
+        return
+    }
+
+    if (window.hasOwnProperty(fileName)) {
+        print(window[fileName])
+        return
+    }
+    print("No file or function named '" + fileName + "'.")
 }

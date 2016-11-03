@@ -30,6 +30,13 @@ function hook(str, args) {
         return true
     }
 
+    if (fileFunctions.indexOf(str) > -1) {
+        //call it as a function
+        //args are an array
+        window[str](args.join(" "));
+        return true
+    }
+
     //and now check for bookmarks
     if (typeof bookmarks != "undefined" && bookmarks.length > 0) {
         for (var i=0; i<bookmarks.length; i++) {
@@ -50,10 +57,6 @@ var hookCommands = [
     'reddit',
     'time',
     'weather',
-    'edit',
-    'close',
-    'save',
-    'rm',
 ];
 
 var bookmarks = [
