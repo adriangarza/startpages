@@ -1,5 +1,5 @@
-$(document).click(function() {
-    $("#input").focus();
+$("#terminal").click(function() {
+    //$("#input").focus();
 })
 
 $(document).ready(function() {
@@ -64,8 +64,10 @@ function init() {
             inputIndex > 0 ? inputIndex-- : true;
             document.getElementById("input").innerHTML = lastInputs[inputIndex];
         } else if (key === 9) { //tab
-            a.preventDefault();
-            autocomplete(document.getElementById("input").innerHTML);
+            if(!editing) {
+                a.preventDefault();
+                autocomplete(document.getElementById("input").innerHTML);
+            }
         }
     });
     getName();
@@ -172,7 +174,7 @@ function help(input) {
     for (var i=0; i<terminalFunctions.length; i++) {
         print(terminalFunctions[i]);
     }
-    fancyRender("functions", "lightgray")
+    fancyRender("commands", "lightgray")
     if (typeof hookCommands != "undefined" && hookCommands.length > 0) {
         for (var i=0; i<hookCommands.length; i++) {
             print(hookCommands[i]);
@@ -182,6 +184,12 @@ function help(input) {
     if (typeof bookmarks != "undefined" && bookmarks.length > 0) {
         for (var i=0; i<bookmarks.length; i++) {
             print(bookmarks[i][0]);
+        }
+    }
+    if (!$.isEmptyObject(files)) {
+        fancyRender("files", "lightgray")
+        for(var prop in files) {
+            print(prop)
         }
     }
 }
@@ -197,12 +205,24 @@ function ls(input) {
         }
         return;
     }
-    if(input.slice(input.length - 2, input.length) + "" === "-f") {
-        fancyRender("functions", "lightgray")
+    if(input.slice(input.length - 2, input.length) + "" === "-c") {
+        fancyRender("commands", "lightgray")
         if (typeof hookCommands != "undefined" && hookCommands.length > 0) {
             for (var i=0; i<hookCommands.length; i++) {
                 print(hookCommands[i]);
             }
+        }
+        return;
+    }
+
+    if(input.slice(input.length - 2, input.length) + "" === "-f") {
+        if ($.isEmptyObject(files)) {
+            print("No files here.")
+            return
+        }
+        fancyRender("files", "lightgray")
+        for(var prop in files) {
+            print(prop)
         }
         return;
     }

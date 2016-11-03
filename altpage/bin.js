@@ -50,6 +50,10 @@ var hookCommands = [
     'reddit',
     'time',
     'weather',
+    'edit',
+    'close',
+    'save',
+    'rm',
 ];
 
 var bookmarks = [
@@ -99,8 +103,8 @@ function weather() {
             || Number(temp_low) < 30
             || Number(temp_high) > 95
             || humidity > 75);
-        //description = description.charAt(0).toUpperCase() + description.slice(1)
-        var weatherString = "It's " + temp_curr + "&deg; out; " + description + ". "
+        description = description.charAt(0).toUpperCase() + description.slice(1)
+        var weatherString = "It's " + temp_curr + "&deg; out. " + description + ". "
         disgusting ? weatherString += "Disgusting." : weatherString += "Not bad."
         print(weatherString)
 	})
