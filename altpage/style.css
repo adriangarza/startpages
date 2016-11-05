@@ -32,8 +32,9 @@ body {
 }
 
 a {
-	color: mediumpurple;
-	text-decoration: none
+	color: #dddddd;
+	text-decoration: none;
+	border-bottom: 1px solid #d0d0d0;
 }
 
 pre, #prompt {

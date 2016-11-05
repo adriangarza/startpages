@@ -271,7 +271,12 @@ function echo(args) {
         print("usage: echo [text]")
         return
     }
-    print(args.join(" "));
+    var printStr = args.join(" ")
+    //greentexting
+    if(printStr.indexOf("&gt;") === 0) {
+        printStr = cssColor(printStr, "#789922")
+    }
+    print(printStr);
 }
 
 function re(s) {
